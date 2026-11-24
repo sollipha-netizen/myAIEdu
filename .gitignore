@@ -1,0 +1,24 @@
+# Python 캐시 / 테스트 캐시
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# 환경 변수 및 비밀 정보 (예시 파일 .env.example 은 포함)
+.env
+.env.*
+!.env.example
+
+# 로컬 SQLite DB (실행 시 생성되는 데이터, 저장소에 올리지 않음)
+backend/data/*.db
+backend/data/*.sqlite
+backend/data/*.sqlite3
+
+# 가상환경
+.venv/
+venv/
+
+# 에디터 / OS 파일
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini

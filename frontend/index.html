@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>4050 AI 실전 입문</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <strong class="brand">4050 AI 실전 입문</strong>
+    <nav>
+      <a href="#curriculum">커리큘럼</a>
+      <a href="#apply">수강 신청</a>
+      <a href="#dashboard">API</a>
+    </nav>
+  </header>
+
+  <main>
+    <p id="practice-banner" class="practice-banner" hidden>
+      실습 모드입니다. 신청해도 실제로 저장되지 않습니다.
+    </p>
+
+    <section class="hero">
+      <p class="eyebrow">퇴근 후 30분</p>
+      <h1>AI를 내 일의 도구로 바꾸는<br>40·50대 입문 과정</h1>
+      <p class="lead">실습 중심 8주 과정입니다. 마지막 주에는 이력서와 자기소개서를 직접 다듬습니다.</p>
+      <a class="btn btn-primary" href="#apply">수강 신청하기</a>
+    </section>
+
+    <section id="curriculum" class="section">
+      <h2>8주 커리큘럼</h2>
+      <p class="muted">수강료: <span id="course-price">추후 안내</span></p>
+      <ol id="week-list" class="week-list"></ol>
+    </section>
+
+    <section id="apply" class="section">
+      <h2>수강 신청</h2>
+      <form id="apply-form" class="apply-form" novalidate>
+        <label>
+          이름 <span class="req">*</span>
+          <input name="name" type="text" autocomplete="name" maxlength="50" required>
+        </label>
+
+        <label>
+          휴대폰 번호 <span class="req">*</span>
+          <input name="phone" type="tel" autocomplete="tel" placeholder="010-0000-0000" required>
+        </label>
+
+        <label>
+          이메일 <span class="optional">(선택)</span>
+          <input name="email" type="email" autocomplete="email" placeholder="example@email.com">
+        </label>
+
+        <label>
+          연령대
+          <select name="age_group">
+            <option value="40s">40대</option>
+            <option value="50s">50대</option>
+            <option value="other">기타</option>
+          </select>
+        </label>
+
+        <label class="consent">
+          <input name="consent" type="checkbox" required>
+          <span>개인정보 수집·이용에 동의합니다 <span class="req">*</span><br>
+            <small>수집 항목: 이름, 휴대폰 번호, 이메일(선택), 연령대 / 보유 기간: 과정 종료 후 1년</small>
+          </span>
+        </label>
+
+        <button type="submit" class="btn btn-primary btn-block" id="submit-btn">신청하기</button>
+        <p id="form-message" class="message" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <!-- API 문서 및 실습 대시보드: 백엔드 명세(/openapi.json)에서 실시간으로 그립니다 -->
+    <section id="dashboard" class="section">
+      <h2>API 문서 &amp; 실습 대시보드</h2>
+      <p class="muted">백엔드 명세에서 바로 만든 화면입니다. 백엔드를 고치면 이 화면도 함께 바뀝니다.</p>
+      <p id="dash-status" class="message" role="status" aria-live="polite">불러오는 중...</p>
+
+      <div id="dash-summary" class="dash-summary"></div>
+
+      <h3>8주 핵심 실습 (실시간 조회)</h3>
+      <div id="practice" class="practice-card"></div>
+
+      <h3>실행 해보기</h3>
+      <p class="muted">버튼을 누르면 실제 API를 호출하고 결과를 바로 보여 줍니다. 저장되는 데이터는 없습니다.</p>
+      <div id="playground" class="playground"></div>
+
+      <h3>엔드포인트</h3>
+      <div id="api-list" class="api-list"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>문의: 카카오톡 채널 [확인 필요]</p>
+  </footer>
+
+  <script src="js/app.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>
