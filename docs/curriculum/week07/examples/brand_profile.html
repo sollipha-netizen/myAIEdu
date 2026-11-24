@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>나의 프로필 카드 만들기</title>
+  <style>
+    /* 과정 화면 규칙(글자 17px 이상, 버튼 48px, 좌우 16px)을 이 파일에서도 지킨다. */
+    :root { --ink: #1f2933; --accent: #1d4ed8; --line: #d0d7de; --soft: #f5f7fa; }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 24px 16px; font: 17px/1.6 system-ui, sans-serif; color: var(--ink); background: #fff; }
+    main { max-width: 640px; margin: 0 auto; }
+    h1 { font-size: 1.5rem; }
+    label { display: block; margin-top: 16px; font-weight: 600; }
+    input, textarea { width: 100%; margin-top: 6px; padding: 12px; font: inherit; border: 1px solid var(--line); border-radius: 8px; }
+    textarea { min-height: 96px; }
+    button { min-height: 48px; margin-top: 20px; padding: 0 24px; font: inherit; font-weight: 700; color: #fff; background: var(--accent); border: 0; border-radius: 8px; cursor: pointer; }
+    .hint { margin: 4px 0 0; font-size: 0.95rem; color: #52606d; }
+    .error { color: #b91c1c; font-weight: 600; }
+    .card { margin-top: 32px; padding: 24px; background: var(--soft); border-left: 6px solid var(--accent); border-radius: 12px; overflow-wrap: anywhere; }
+    .card h2 { margin: 0; }
+    .card .tagline { font-size: 1.1rem; font-weight: 700; color: var(--accent); }
+  </style>
+</head>
+<body>
+<main>
+  <h1>나의 프로필 카드 만들기 (7주차)</h1>
+  <p>입력한 내용은 이 브라우저 안에서만 쓰이고 어디에도 전송되지 않습니다.</p>
+
+  <form id="profile-form" novalidate>
+    <label for="name">이름 또는 활동명</label>
+    <input id="name" maxlength="20" placeholder="예: 품질코치 김바름">
+
+    <label for="tagline">한 줄 소개</label>
+    <input id="tagline" maxlength="40" placeholder="40자 이내">
+    <p class="hint">실습 2단계에서 고른 문장을 붙여 넣으세요.</p>
+
+    <label for="bio">3줄 프로필</label>
+    <textarea id="bio" placeholder="한 줄에 한 문장씩"></textarea>
+
+    <label for="experiences">대표 경험 (한 줄에 하나, 최대 3개)</label>
+    <textarea id="experiences" placeholder="예: 품질 인증 심사 5회 통과"></textarea>
+
+    <p id="form-error" class="error" role="alert"></p>
+    <button type="submit">미리보기 만들기</button>
+  </form>
+
+  <section id="preview" aria-live="polite"></section>
+</main>
+
+<script>
+  // 이 파일은 혼자 열어도 동작해야 하므로 과정 앱의 app.js를 불러오지 않고 필요한 함수만 둔다.
+  const MAX_EXPERIENCES = 3;
+
+  // 입력값을 HTML에 넣기 전에 반드시 거친다. 태그가 그대로 실행되는 것을 막기 위함이다.
+  function escapeHtml(text) {
+    return String(text).replace(/[&<>"']/g, (ch) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+    })[ch]);
+  }
+
+  // 여러 줄 입력을 빈 줄 없는 목록으로 바꾼다. 수강생이 줄 끝에 공백을 남기는 경우가 많다.
+  function toLines(text) {
+    return text.split("\n").map((line) => line.trim()).filter(Boolean);
+  }
+
+  function renderCard(data) {
+    const items = data.experiences.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
+    const bio = data.bio.map((line) => `<p>${escapeHtml(line)}</p>`).join("");
+    return `<article class="card">
+      <h2>${escapeHtml(data.name)}</h2>
+      <p class="tagline">${escapeHtml(data.tagline)}</p>
+      ${bio}
+      ${items ? `<strong>대표 경험</strong><ul>${items}</ul>` : ""}
+    </article>`;
+  }
+
+  document.querySelector("#profile-form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    const value = (id) => document.querySelector(`#${id}`).value.trim();
+    const errorBox = document.querySelector("#form-error");
+    const data = {
+      name: value("name"),
+      tagline: value("tagline"),
+      bio: toLines(value("bio")),
+      experiences: toLines(value("experiences")).slice(0, MAX_EXPERIENCES),
+    };
+    if (!data.name || !data.tagline) {
+      errorBox.textContent = "이름과 한 줄 소개는 꼭 입력해 주세요.";
+      return;
+    }
+    errorBox.textContent = "";
+    document.querySelector("#preview").innerHTML = renderCard(data);
+  });
+</script>
+</body>
+</html>

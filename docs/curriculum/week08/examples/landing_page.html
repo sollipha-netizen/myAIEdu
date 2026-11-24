@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>서비스 소개 페이지 만들기</title>
+  <style>
+    /* 과정 화면 규칙(글자 17px 이상, 버튼 48px, 좌우 16px)을 이 파일에서도 지킨다. */
+    :root { --ink: #1f2933; --accent: #047857; --line: #d0d7de; --soft: #f0fdf4; }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 24px 16px; font: 17px/1.6 system-ui, sans-serif; color: var(--ink); background: #fff; }
+    main { max-width: 640px; margin: 0 auto; }
+    h1 { font-size: 1.5rem; }
+    label { display: block; margin-top: 16px; font-weight: 600; }
+    input, textarea { width: 100%; margin-top: 6px; padding: 12px; font: inherit; border: 1px solid var(--line); border-radius: 8px; }
+    textarea { min-height: 96px; }
+    button { min-height: 48px; margin-top: 20px; padding: 0 24px; font: inherit; font-weight: 700; color: #fff; background: var(--accent); border: 0; border-radius: 8px; cursor: pointer; }
+    .error { color: #b91c1c; font-weight: 600; }
+    .landing { margin-top: 32px; padding: 24px; background: var(--soft); border-radius: 12px; overflow-wrap: anywhere; }
+    .landing h2 { margin-top: 0; font-size: 1.6rem; }
+    .landing .price { font-size: 1.2rem; font-weight: 700; color: var(--accent); }
+    .landing .cta { padding: 12px 16px; background: #fff; border: 2px solid var(--accent); border-radius: 8px; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>서비스 소개 페이지 만들기 (8주차)</h1>
+  <p>입력한 내용은 이 브라우저 안에서만 쓰이고 어디에도 전송되지 않습니다.</p>
+
+  <form id="landing-form" novalidate>
+    <label for="service">서비스 이름</label>
+    <input id="service" maxlength="30" placeholder="예: 첫 품질 인증 준비 상담">
+
+    <label for="target">이런 분께 필요합니다</label>
+    <input id="target" maxlength="60" placeholder="예: 첫 인증 심사를 앞둔 소규모 공장 대표님">
+
+    <label for="problem">해결하는 문제</label>
+    <textarea id="problem" placeholder="고객이 겪는 어려움을 고객의 말로 적어 보세요"></textarea>
+
+    <label for="offers">제공 내용 (한 줄에 하나, 최대 3개)</label>
+    <textarea id="offers" placeholder="예: 필요 서류 점검표 제공"></textarea>
+
+    <label for="price">가격</label>
+    <input id="price" maxlength="30" placeholder="예: 60분 상담 5만 원">
+
+    <label for="contact">신청 방법</label>
+    <input id="contact" maxlength="60" placeholder="예: 카카오톡 오픈채팅 '품질코치'로 문의">
+
+    <p id="form-error" class="error" role="alert"></p>
+    <button type="submit">소개 페이지 만들기</button>
+  </form>
+
+  <section id="preview" aria-live="polite"></section>
+</main>
+
+<script>
+  // 이 파일은 혼자 열어도 동작해야 하므로 과정 앱의 app.js를 불러오지 않고 필요한 함수만 둔다.
+  const MAX_OFFERS = 3;
+  const REQUIRED_FIELDS = { service: "서비스 이름", target: "대상", price: "가격", contact: "신청 방법" };
+
+  // 입력값을 HTML에 넣기 전에 반드시 거친다. 태그가 그대로 실행되는 것을 막기 위함이다.
+  function escapeHtml(text) {
+    return String(text).replace(/[&<>"']/g, (ch) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+    })[ch]);
+  }
+
+  function toLines(text) {
+    return text.split("\n").map((line) => line.trim()).filter(Boolean);
+  }
+
+  // 빠진 필수 항목 이름을 모아 한 번에 알려 준다. 하나씩 알려 주면 여러 번 눌러야 해서 번거롭다.
+  function findMissing(data) {
+    return Object.keys(REQUIRED_FIELDS).filter((key) => !data[key]).map((key) => REQUIRED_FIELDS[key]);
+  }
+
+  function renderLanding(data) {
+    const offers = data.offers.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
+    return `<article class="landing">
+      <h2>${escapeHtml(data.service)}</h2>
+      <p><strong>이런 분께 필요합니다.</strong> ${escapeHtml(data.target)}</p>
+      ${data.problem ? `<p>${escapeHtml(data.problem)}</p>` : ""}
+      ${offers ? `<strong>제공 내용</strong><ul>${offers}</ul>` : ""}
+      <p class="price">${escapeHtml(data.price)}</p>
+      <p class="cta">신청 방법: ${escapeHtml(data.contact)}</p>
+    </article>`;
+  }
+
+  document.querySelector("#landing-form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    const value = (id) => document.querySelector(`#${id}`).value.trim();
+    const errorBox = document.querySelector("#form-error");
+    const data = {
+      service: value("service"),
+      target: value("target"),
+      problem: value("problem"),
+      offers: toLines(value("offers")).slice(0, MAX_OFFERS),
+      price: value("price"),
+      contact: value("contact"),
+    };
+    const missing = findMissing(data);
+    if (missing.length) {
+      errorBox.textContent = `다음 항목을 입력해 주세요: ${missing.join(", ")}`;
+      return;
+    }
+    errorBox.textContent = "";
+    document.querySelector("#preview").innerHTML = renderLanding(data);
+  });
+</script>
+</body>
+</html>
